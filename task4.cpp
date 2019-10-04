@@ -1,3 +1,8 @@
+/*
+Дан массив целых чисел, нужно найти непустой подотрезок (непрерывную подпоследовательность)
+с заданной суммой X, либо сказать, что это невозможно.
+*/
+
 #include <iostream>
 #include <vector>
 
@@ -132,8 +137,13 @@ int main() {
     // В обоих случаях сложность по памяти - O(1)
 
     auto pair = find_sum(v, sum);
-
-    for (size_t i = pair.first; i < pair.second; ++i) {
-        std:: cout << v[i] << " ";
+    
+    if (piar.first == pair.second) {
+        std:: cout << "It is impossible";
+    }
+    else {
+        for (size_t i = pair.first; i < pair.second; ++i) {
+            std:: cout << v[i] << " ";
+        }
     }
 }
