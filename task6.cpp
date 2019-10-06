@@ -1,6 +1,5 @@
 /*
 Написать проверку является ли дерево бинарным деревом поиска bool is_binary_search_tree(const Node * root).
-
 P.S. Запрограммировался и в качестве простого дерева случайно написал бинарное дерево поиска со всеми его операциям,
 поэтому пришлось создавать фукции shake_tree4, чтобы дерево не было бинарным
 */
@@ -234,6 +233,56 @@ public:
 };
 
 template <typename T>
+bool is_right_binary_search_tree(const node<T>* root, const T& root_data) {
+    bool right_binary_search_tree = true;
+
+    if (root == nullptr || (root->left == nullptr && root->right == nullptr)) {
+        return right_binary_search_tree;
+    }
+
+    if (root->left != nullptr) {
+        right_binary_search_tree = right_binary_search_tree &&
+                             root->left->data < root->data &&
+                             root->left->data >= root_data;
+    }
+
+    if (root->right != nullptr) {
+        right_binary_search_tree = right_binary_search_tree &&
+                             root->right->data >= root->data &&
+                             root->right->data >= root_data;
+    }
+
+    return right_binary_search_tree &&
+            is_left_binary_search_tree(root->left, root->data) &&
+            is_right_binary_search_tree(root->right, root->data);
+}
+
+template <typename T>
+bool is_left_binary_search_tree(const node<T>* root, const T& root_data) {
+    bool left_binary_search_tree = true;
+
+    if (root == nullptr || (root->left == nullptr && root->right == nullptr)) {
+        return left_binary_search_tree;
+    }
+
+    if (root->left != nullptr) {
+        left_binary_search_tree = left_binary_search_tree &&
+                             root->left->data < root->data &&
+                             root->left->data < root_data;;
+    }
+
+    if (root->right != nullptr) {
+        left_binary_search_tree = left_binary_search_tree &&
+                             root->right->data >= root->data &&
+                             root->right->data < root_data;
+    }
+
+    return left_binary_search_tree &&
+           is_left_binary_search_tree(root->left, root->data) &&
+           is_right_binary_search_tree(root->right, root->data);
+}
+
+template <typename T>
 bool is_binary_search_tree(const node<T>* root) {
     bool binary_search_tree = true;
 
@@ -243,15 +292,17 @@ bool is_binary_search_tree(const node<T>* root) {
 
     if (root->left != nullptr) {
         binary_search_tree = binary_search_tree &&
-                root->left->data < root->data;
+                                  root->left->data < root->data;
     }
 
     if (root->right != nullptr) {
         binary_search_tree = binary_search_tree &&
-                             root->right->data >= root->data;
+                                  root->right->data >= root->data;
     }
 
-    return binary_search_tree && is_binary_search_tree(root->left) && is_binary_search_tree(root->right);
+    return binary_search_tree &&
+            is_left_binary_search_tree(root->left, root->data) &&
+            is_right_binary_search_tree(root->right, root->data);
 }
 
 template <typename T>
@@ -260,7 +311,30 @@ bool is_binary_search_tree(const binary_tree<T>& tree) {
 }
 
 int main() {
-    binary_tree<int> tree({1,0,-100,4, 300, 2, 2, 0});
+    // проверка случая:
+    //   2
+    //  /
+    // 1
+    //  \
+    //   3
+    
+    /*
+    int one = 1, two = 2, three = 3;
+    node<int>* root = new node<int>(two);
+    node<int>* next = new node<int>(one);
+    node<int>* next_next = new node<int>(three);
+
+    root->left = next;
+    next->right = next_next;
+
+    std::cout << is_binary_search_tree(root);
+    
+    delete root;
+    delete next;
+    delete next_next;
+    */
+
+    binary_tree<int> tree({2,1,5,4,8,0,15,-7});
     bool success = is_binary_search_tree(tree);
     if (success) {
         std::cout << "Is binary search tree:" << std::endl;
