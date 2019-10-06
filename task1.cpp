@@ -15,38 +15,26 @@ A4B3C2XYZD4E3F3A6B28
 #include <iostream>
 #include <string>
 
-void change_string(std::string &str) {
+bool RLE(std::string &str) {
     std::string s{};
-    size_t i = 0, j = 0, k = 0;
-    bool success = true;
+    size_t i = 0, count = 0;
+    bool success = !str.empty();
 
     while (i < str.size()) {
-        if (str[i] < 65 || str[i] > 90) {
-            s = "Not valid string";
-            success = false;
-            break;
-        }
-
         s += str[i];
         while (i + 1 < str.size() && str[i] == str[i + 1]) {
-            if (str[i] < 65 || str[i] > 90) {
-                s = "Not valid string";
-                success = false;
-                break;
-            }
-            ++k;
+            ++count;
             ++i;
         }
 
-        if (!success)
-            break;
-
-        s += k ? std::to_string(k + 1) : "";
-        k = 0;
+        s += count ? std::to_string(count + 1) : "";
+        count = 0;
         ++i;
     }
 
     str = s;
+
+    return success;
 }
 
 int main() {
@@ -54,9 +42,12 @@ int main() {
 
     std::cin >> str;
 
-    change_string(str);
-
-    std::cout << str;
+    if (RLE(str)) {
+        std::cout << str;
+    }
+    else {
+        std::cout << "Not valid string";
+    }
 
     return 0;
 }
