@@ -6,9 +6,8 @@ P.S. Запрограммировался и в качестве простог�
 
 /*
 Сложность по времени - O(n), где n - количество элементов в дереве. Достаточно совершить in-order проход по
-дереву, чтобы проверить свойства бинарного дерева поиска (проверяя, что ВСЕ элементы левого поддерева меньше
-текущего корня, а ВСЕ элементы правого поддерева не меньше текущего корня)
-Сложность по памяти - O(1)
+дереву, чтобы проверить свойства бинарного дерева поиска
+Сложность по памяти - O(n), так как требуется дополнительный вектор
 */
 
 #include <iostream>
@@ -233,82 +232,35 @@ public:
     }
 };
 
-template <typename T>
-bool is_right_binary_search_tree(const node<T>* root, const T& root_data) {
-    bool right_binary_search_tree = true;
-
-    if (root == nullptr || (root->left == nullptr && root->right == nullptr)) {
-        return right_binary_search_tree;
-    }
-
-    if (root->left != nullptr) {
-        right_binary_search_tree = right_binary_search_tree &&
-                             root->left->data < root->data &&
-                             root->left->data >= root_data;
-    }
-
-    if (root->right != nullptr) {
-        right_binary_search_tree = right_binary_search_tree &&
-                             root->right->data >= root->data &&
-                             root->right->data >= root_data;
-    }
-
-    return right_binary_search_tree &&
-            is_left_binary_search_tree(root->left, root->data) &&
-            is_right_binary_search_tree(root->right, root->data);
-}
 
 template <typename T>
-bool is_left_binary_search_tree(const node<T>* root, const T& root_data) {
-    bool left_binary_search_tree = true;
-
-    if (root == nullptr || (root->left == nullptr && root->right == nullptr)) {
-        return left_binary_search_tree;
+void in_order_bypass(const node<T>* root, std::vector<T>& v) {
+    if (root == nullptr) {
+        return;
     }
 
-    if (root->left != nullptr) {
-        left_binary_search_tree = left_binary_search_tree &&
-                             root->left->data < root->data &&
-                             root->left->data < root_data;;
-    }
+    in_order_bypass(root->left, v);
 
-    if (root->right != nullptr) {
-        left_binary_search_tree = left_binary_search_tree &&
-                             root->right->data >= root->data &&
-                             root->right->data < root_data;
-    }
+    v.push_back(root->data);
 
-    return left_binary_search_tree &&
-           is_left_binary_search_tree(root->left, root->data) &&
-           is_right_binary_search_tree(root->right, root->data);
-}
-
-template <typename T>
-bool is_binary_search_tree(const node<T>* root) {
-    bool binary_search_tree = true;
-
-    if (root == nullptr || (root->left == nullptr && root->right == nullptr)) {
-        return binary_search_tree;
-    }
-
-    if (root->left != nullptr) {
-        binary_search_tree = binary_search_tree &&
-                                  root->left->data < root->data;
-    }
-
-    if (root->right != nullptr) {
-        binary_search_tree = binary_search_tree &&
-                                  root->right->data >= root->data;
-    }
-
-    return binary_search_tree &&
-            is_left_binary_search_tree(root->left, root->data) &&
-            is_right_binary_search_tree(root->right, root->data);
+    in_order_bypass(root->right, v);
 }
 
 template <typename T>
 bool is_binary_search_tree(const binary_tree<T>& tree) {
-    return is_binary_search_tree(tree.get_root());
+    std::vector<T> v{};
+    in_order_bypass(tree.get_root(), v);
+
+    bool success = true;
+
+    for (size_t i = 0; i < v.size() - 1; ++i) {
+        if (v[i] > v[i+1]) {
+            success = false;
+            break;
+        }
+    }
+
+    return success;
 }
 
 int main() {
@@ -318,16 +270,14 @@ int main() {
     // 1
     //  \
     //   3
-    
+
     /*
     int one = 1, two = 2, three = 3;
     node<int>* root = new node<int>(two);
     node<int>* next = new node<int>(one);
     node<int>* next_next = new node<int>(three);
-
     root->left = next;
     next->right = next_next;
-
     std::cout << is_binary_search_tree(root);
     
     delete root;
